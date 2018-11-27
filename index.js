@@ -8,6 +8,7 @@ mongoose.connect('mongodb://localhost:27017/BMI-calculator',  {
     useNewUrlParser: true
 });
 
+const {User} = require('./models/user');
 
 var app = express();
 //parsing request bodies
