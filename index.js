@@ -22,6 +22,21 @@ app.use(
     })
   );
 
+  app.post('/users', (req, res) => {
+    const user = new User({
+        username: req.body.username
+    });
+
+    user.save()
+        .then((user) => {
+            res.send(user);
+        })
+        .catch(() => {
+            res.status(400).send();
+        });
+    
+});
+
 
 app.listen(3000, () => {
     console.log(`Server running on port 3000`);
