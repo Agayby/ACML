@@ -48,9 +48,9 @@ class Layout extends React.Component {
 
         this.state = {
             history: false,
-            calculator: false,
+            calculator: true,
             score: false,
-            signIn: true
+            signIn: false
         }
     }
 
@@ -94,7 +94,7 @@ class Layout extends React.Component {
         if(this.state.score)
         {
             currentComponent = (
-                <Score/>
+                <Score bmi="21.5" back={this.calculatorHandler}/>
             )
         }
 
