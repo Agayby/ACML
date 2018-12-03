@@ -1,3 +1,4 @@
+require('./config/config');
 const express = require('express');
 const bodyParser = require('body-parser');
 var {mongoose} = require('./db/mongoose');
@@ -102,6 +103,6 @@ app.get('/api/users/bmis', authenticate ,(req, res) => {
 });
 
 
-app.listen(3437, () => {
-    console.log(`Server running on port 3437`);
+app.listen(process.env.PORT, () => {
+    console.log(`Server running on port ${process.env.PORT}`);
   });

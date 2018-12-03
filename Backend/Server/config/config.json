@@ -1,0 +1,6 @@
+{
+    "PORT": 3437,
+    "MONGODB_URI": "mongodb://localhost:27017/BMI-calculator",
+    "JWT_SECRET": "abc123",
+    "APP_KEY": "jkXoSu3x8YmshD230kBDwSIebIdIp1oeQLLjsnJfu4jB9MgqNd"
+  }
