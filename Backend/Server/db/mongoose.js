@@ -2,7 +2,9 @@ let mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
 
-mongoose.connect('mongodb://mongo:27017/BMI-calculator',  {
+mongoose.connect(process.env.MONGODB_URI.toString(),
+    //'mongodb://localhost:27017/BMI-calculator',  
+    {
          useNewUrlParser: true
      });
 
