@@ -4,6 +4,10 @@ import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import API from '../../API/API';
+import Axios from '../../Axios/Axios';
+
+import { connect } from 'react-redux';
 
 
 class Score extends React.Component {
@@ -11,28 +15,42 @@ class Score extends React.Component {
     constructor(props) 
     {
         super(props);
-
+        this.API = new API();
         this.state = {
-            bmi: this.props.bmi,
-            color: ""
+            bmi: 0.00,
+            color: "white",
+            weight: 0.00,
+            height: 0.00
         }
-
-        if (this.state.bmi < 18.5)
-            this.state.color = "royalblue"; 
-        else if(this.state.bmi <= 25)
-            this.state.color = "mediumseagreen";
-        else if(this.state.bmi <= 30)
-            this.state.color = "gold";
-        else if(this.state.bmi <= 35)
-            this.state.color = "orange";
-        else if(this.state.bmi <= 40)
-            this.state.color = "red";
-        else 
-            this.state.color = "darkred";
        
     }
 
     componentDidMount() {
+
+        this.state.height = this.props.height / 100;
+        this.state.weight = this.props.weight;
+
+        this.API.getBMI(this.state.weight, this.state.height).then((response) => {
+
+            let c = "white";
+            if (response.data.result < 18.5)
+            c = "royalblue"; 
+            else if(response.data.result <= 25)
+                c = "mediumseagreen";
+            else if(response.data.result <= 30)
+                c = "gold";
+            else if(response.data.result <= 35)
+                c = "orange";
+            else if(response.data.result <= 40)
+                c = "red";
+            else 
+                c = "darkred";
+            this.setState({
+                bmi: (response.data.result).toFixed(2),
+                color: c
+            });
+            
+        });
     }
 
     backHandler = () => {
@@ -40,10 +58,38 @@ class Score extends React.Component {
     }
 
     saveHandler = () => {
-        console.log('save button pressed');
+
+        let body = {
+            bmi: this.state.bmi, 
+            weight: this.state.weight, 
+            height: this.state.height
+
+        }
+
+        var headers = {
+            'x-auth': this.props.token,
+        }
+
+        Axios.patch(`/users/save/${this.props.id}`, {body}, {headers: headers}).then((response) => {
+            console.log(response)
+            this.props.updateBMIs(response.data.updatedUser.bmis);
+        }).catch((error) => {
+            console.log(error);
+        })
+
     }
 
     render() {
+
+        let save;
+        if(this.props.isAuthenticated)
+        {
+            save = (
+            <Button variant="contained" color="primary" onClick={this.saveHandler}>
+                Save
+            </Button>    
+            )
+        }
 
         return(
 
@@ -127,9 +173,8 @@ class Score extends React.Component {
                     </div>
                     <div className="column" style = {{flex: '5%'}} >
                         <CardActions>
-                            <Button variant="contained" color="primary" onClick={this.saveHandler}>
-                                 Save
-                            </Button>       
+                            
+                            {save}   
                         </CardActions>
                     </div>
                 </div>
@@ -141,4 +186,14 @@ class Score extends React.Component {
 
 }
 
-export default Score;
+
+const mapStateToProps = state => {
+    return {
+        error: state.error,
+        isAuthenticated: state.token !== null,
+        id: state.userID,
+        token: state.token
+    };
+};
+
+export default connect( mapStateToProps, null )( Score );
