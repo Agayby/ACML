@@ -13,7 +13,11 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Calculator from '../Calculator/Calculator';
 import History from '../History/History';
 import Score from '../Score/Score';
-import SignIn from '../SignIn/SignIn';
+import Auth from '../Auth/Auth';
+import Button from '@material-ui/core/Button';
+import * as actions from '../../store/actions/auth';
+
+import { connect } from 'react-redux';
 
 const drawerWidth = 240;
 
@@ -48,19 +52,26 @@ class Layout extends React.Component {
 
         this.state = {
             history: false,
-            calculator: true,
+            calculator: false,
             score: false,
-            signIn: false
+            auth: true,
+            weight: 0,
+            height: 0,
+
+            email: null,
+            password: null,
+
+            bmis: []
         }
     }
-
 
     calculatorHandler = () => {
         this.setState({
             history:false,
             calculator:true,
             score: false,
-            signIn: false} );
+            auth: false,
+            } );
 
     }
 
@@ -69,41 +80,105 @@ class Layout extends React.Component {
             history:true,
             calculator:false,
             score: false,
-            signIn: false} );
+            auth: false} );
         
+    }
+
+    authHandler = () => {
+        this.setState({
+            history:false,
+            calculator:false,
+            score: false,
+            auth: true} );
+    }
+
+    saveBMIInputs = (weight, height) => {
+        
+        this.setState({
+            history: false,
+            calculator: false,
+            score: true,
+            auth: false,
+            weight: weight,
+            height: height
+        });
+        
+    }
+
+    setEmailAndPassword = (email, password) => {
+        this.state.email = email;
+        this.state.password = password;
+    }
+
+    logoutUser = () => {
+        this.props.onLogout(this.props.token, this.state.email, this.state.password);
+        this.state.auth = true;
+        this.state.calculator = false;
+        this.state.history = false;
+        this.state.score = false;
+
+    }
+
+    updateBMIs = (bmiArr) => {
+        this.setState({
+            bmis: bmiArr
+        })
+        //localStorage.setItem('history', bmiArr);
+
     }
 
     render(){
         const { classes } = this.props;
 
         let currentComponent = null;
+
         if(this.state.calculator)
         {
             currentComponent = (
-                <Calculator/>
+                <Calculator handleCalculate={(weight, height) => this.saveBMIInputs(weight, height)}/>
             )
         }
 
         if(this.state.history)
         {
             currentComponent = (
-                <History/>
+                <History bmis = {this.state.bmis}/>
             )
         }
 
         if(this.state.score)
         {
             currentComponent = (
-                <Score bmi="21.5" back={this.calculatorHandler}/>
+                <Score  back={this.calculatorHandler} weight={this.state.weight} height = {this.state.height} bmis = {this.state.bmis}
+                updateBMIs = {(bmiArr) => this.updateBMIs(bmiArr)}/>
             )
         }
 
-        if(this.state.signIn)
+        if(this.state.auth && !this.props.isAuthenticated)
         {
             currentComponent = (
-                <SignIn/>
+                <Auth setEmailAndPassword={(email, password) => this.setEmailAndPassword(email, password)}/>
             )
         }
+
+        if(this.state.auth && this.props.isAuthenticated)
+        {
+            this.state.auth = false;
+            this.state.calculator = true;
+            this.state.history = false;
+            this.state.score = false;
+
+            currentComponent = (
+                <Calculator handleCalculate={(weight, height) => this.saveBMIInputs(weight, height)}/>
+            )
+        }
+
+        let button = null;
+
+        if(this.props.isAuthenticated)
+            button = (<Button onClick={this.logoutUser}>Logout</Button>)
+        else
+            button = (<Button onClick={this.authHandler}>Login/SignUp</Button>)
 
 
     return (
@@ -114,6 +189,7 @@ class Layout extends React.Component {
             <Typography variant="h6" color="inherit" noWrap>
                 BMI Calculator
             </Typography>
+            {button}
             </Toolbar>
         </AppBar>
         <Drawer
@@ -153,4 +229,17 @@ Layout.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(Layout);
+const mapStateToProps = state => {
+  return {
+    isAuthenticated: state.token !== null,
+    token: state.token
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    onLogout: (token, email, password) => dispatch( actions.logout(token, email, password) )
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(Layout));
