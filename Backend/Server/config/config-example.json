@@ -1,0 +1,5 @@
+{
+    "PORT": 9000,
+    "MONGODB_URI": "i am url",
+    "JWT_SECRET": "i am key"
+  }
