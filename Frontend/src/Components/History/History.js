@@ -1,8 +1,10 @@
 import React from 'react';
-import HistoryItem from '../History/HistoryItem/HistoryItem';
+import HistoryItem from './HistoryItem/HistoryItem';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Divider from '@material-ui/core/Divider';
+
+import { connect } from 'react-redux';
 
 class History extends React.Component {
 
@@ -11,31 +13,46 @@ class History extends React.Component {
         super(props);
 
         this.state = {
-            history:[
-                {date:"24/11/2018", bmi:"31", height:"160", weight :"60"}, 
-                {date:"25/11/2018", bmi:"32", height:"170", weight :"70"}, 
-                {date:"26/11/2018", bmi:"33", height:"180", weight :"80"}, 
-                {date:"27/11/2018", bmi:"34", height:"190", weight :"90"},
-                
-            ]
+            history: this.props.bmis
         }
     }
 
-    componentDidMount() {
-        //calls backend to get history and save it into state and render them to the screen
+    componentDidMount () {
+        this.setState({
+            history: this.props.bmis
+           //history: localStorage.getItem('history')
+        })
+
+        
     }
 
     render() {
 
-        const historyItems = this.state.history.map(historyItem => {
-            return (
-                <div>
-                    <HistoryItem date={historyItem.date} bmi={historyItem.bmi} height={historyItem.height} weight ={historyItem.weight}/>
-                    <br/>
-                    <Divider/>
-                </div>
-            );
-        })
+        let historyItems;
+
+        if(this.props.isAuthenticated)
+        {
+            historyItems = this.state.history.map((historyItem) => {
+                var d = historyItem.date;
+                d = d.split('T')[0];
+                historyItem.date = d;
+                return (
+                    <div>
+                        <HistoryItem key = {Date.now()} date={historyItem.date} bmi={historyItem.bmi} height={historyItem.height} weight ={historyItem.weight}/>
+                        <br/>
+                        <Divider/>
+                    </div>
+                );
+            });
+
+        }
+        else
+        {
+            historyItems = (
+                <label>Login now to check your history!</label>
+            )
+        }
+
 
         return(
             <Card>
@@ -49,4 +66,11 @@ class History extends React.Component {
        
 }
 
-export default History;
+
+const mapStateToProps = (state) => {
+    return {
+        isAuthenticated: state.token !== null,
+    };
+}
+
+export default connect(mapStateToProps, null)(History);

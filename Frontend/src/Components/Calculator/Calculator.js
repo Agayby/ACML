@@ -7,7 +7,8 @@ import Switch from '@material-ui/core/Switch';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
-import ErrorSnackbar from '../SnackBar/SnackError'
+import ErrorSnackbar from '../SnackBar/SnackError';
+
   
   const theme = createMuiTheme({
     palette: {
@@ -36,21 +37,18 @@ class Calculator extends React.Component {
         this.setState({
             age: event.target.value
         });
-        console.log(this.state.age);
     }
 
     handleWeight = (event) => {
         this.setState({
             weight: event.target.value
         });
-        console.log(this.state.weight);
     }
 
     handleHeight = (event) => {
         this.setState({
             height: event.target.value
         });
-        console.log(this.state.height);
     }
 
     handleToggle = (event) => {
@@ -63,8 +61,6 @@ class Calculator extends React.Component {
             checked: event.target.checked,
             gender: gen            
         })
-        console.log(this.state.checked)
-        console.log(this.state.gender)
     }
 
     handleCalculate = () => {
@@ -72,7 +68,10 @@ class Calculator extends React.Component {
         {
             this.errorbar.handleClick();
         }
-        console.log('calculate the bmi')
+        else
+        {
+            this.props.handleCalculate(this.state.weight, this.state.height);
+        }
     }
     
     render(){
