@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node Server/Server.js",
     "backfront": "concurrently \"npm start\" \"npm run frontend\"",
-    "frontend": "npm install --prefix frontend && npm start --prefix frontend"
+    "frontend": "npm install --prefix Frontend && npm start --prefix Frontend"
   },
   "author": "",
   "license": "ISC",
@@ -21,6 +21,7 @@
     "jsonwebtoken": "^8.4.0",
     "lodash": "^4.17.11",
     "mongodb": "^3.1.10",
-    "validator": "^10.9.0"
+    "validator": "^10.9.0",
+    "concurrently": "4.1.0"
   }
 }
